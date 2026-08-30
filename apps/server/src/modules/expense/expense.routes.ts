@@ -3,6 +3,8 @@ import {
   expenseSortFields,
   paginatedExpensesSchema,
   expenseTypeSchema,
+  expenseSummarySchema,
+  summaryGroupBySchema,
 } from './expense.entity'
 import { expenseService } from './expense.service'
 import { requestIdPlugin } from '../../shared/plugins/request-id.plugin'
@@ -37,6 +39,23 @@ export const expenses = new Elysia({ prefix: '/expenses', tags: ['expenses'] })
       response: {
         200: paginatedExpensesSchema,
         400: errorSchema,
+      },
+    },
+  )
+  // Declared before `/:id` for readability — Elysia's radix router already
+  // prefers a static segment over a dynamic one regardless of order.
+  .get(
+    '/summary',
+    ({ query, authUser }) =>
+      expenseService.summary(authUser!.userId, { ...query, groupBy: query.groupBy ?? 'category' }),
+    {
+      query: t.Object({
+        from: t.Optional(t.String()),
+        to: t.Optional(t.String()),
+        groupBy: t.Optional(summaryGroupBySchema),
+      }),
+      response: {
+        200: expenseSummarySchema,
       },
     },
   )

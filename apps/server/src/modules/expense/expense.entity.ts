@@ -19,3 +19,28 @@ export const expenseSortFields = ['id', 'date', 'amount'] as const
 export type ExpenseSortField = (typeof expenseSortFields)[number]
 
 export const paginatedExpensesSchema = createPaginatedResponseSchema(expenseSchema)
+
+// Written as an explicit tuple for the same reason as `expenseTypeSchema`.
+export const summaryGroupBySchema = t.Union([
+  t.Literal('category'),
+  t.Literal('month'),
+  t.Literal('type'),
+])
+export type SummaryGroupBy = 'category' | 'month' | 'type'
+
+const summaryGroupSchema = t.Object({
+  key: t.String(), // category name, "YYYY-MM", or "income"/"expense" depending on groupBy
+  totalIncome: t.Number(),
+  totalExpense: t.Number(),
+  balance: t.Number(),
+  count: t.Number(),
+})
+
+export const expenseSummarySchema = t.Object({
+  groupBy: summaryGroupBySchema,
+  totalIncome: t.Number(),
+  totalExpense: t.Number(),
+  balance: t.Number(),
+  count: t.Number(),
+  byGroup: t.Array(summaryGroupSchema),
+})

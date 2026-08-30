@@ -172,4 +172,13 @@ export const expenseRepository = {
     db.push(item)
     return item
   },
+
+  // Unpaged — summary aggregates over the whole (optionally date-bounded) set.
+  findAllByUser: (params: { userId: number; from?: string; to?: string }): Expense[] =>
+    db.filter(
+      (item) =>
+        item.userId === params.userId &&
+        (params.from === undefined || item.date >= params.from) &&
+        (params.to === undefined || item.date <= params.to),
+    ),
 }
