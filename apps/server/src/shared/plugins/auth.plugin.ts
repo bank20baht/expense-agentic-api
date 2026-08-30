@@ -3,7 +3,7 @@ import { jwt } from '@elysiajs/jwt'
 import type { JwtPayload } from '../../modules/auth/auth.entity'
 
 // POC secret — move to an env var before this ever sees production traffic.
-export const JWT_SECRET = 'expense-poc-secret-change-me'
+const JWT_SECRET = 'expense-poc-secret-change-me'
 
 export const jwtPlugin = new Elysia().use(jwt({ name: 'jwt', secret: JWT_SECRET }))
 

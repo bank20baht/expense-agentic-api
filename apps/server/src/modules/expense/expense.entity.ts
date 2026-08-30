@@ -1,11 +1,8 @@
 import { t } from 'elysia'
 import { createPaginatedResponseSchema } from '../../shared/pagination/pagination.schema'
 
-export const expenseTypes = ['income', 'expense'] as const
-export type ExpenseType = (typeof expenseTypes)[number]
-
-// Written as an explicit tuple, not `expenseTypes.map(t.Literal)` — mapping
-// over the array loses literal narrowing and TS infers the union as `never`.
+// Written as an explicit tuple, not `[...].map(t.Literal)` — mapping over an
+// array loses literal narrowing and TS infers the union as `never`.
 export const expenseTypeSchema = t.Union([t.Literal('income'), t.Literal('expense')])
 
 export const expenseSchema = t.Object({
