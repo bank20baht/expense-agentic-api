@@ -6,6 +6,6 @@ export const errorSchema = t.Object({
   requestId: t.Optional(t.String()),
 })
 
-type ServiceError = 'NOT_FOUND' | 'INVALID_CURSOR'
+type ServiceError = 'NOT_FOUND' | 'INVALID_CURSOR' | 'INVALID_CREDENTIALS'
 
 export type Result<T> = { ok: true; data: T } | { ok: false; error: ServiceError }

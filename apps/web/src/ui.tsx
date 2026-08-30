@@ -1,77 +1,62 @@
-import { useCallback, useMemo, type KeyboardEvent } from 'react'
-import type { FieldDescriptor } from 'uibank/core'
+import type { CSSProperties, KeyboardEvent } from 'react'
 
-/**
- * uibank field primitives (`ub-input`, `ub-checkbox`, …) are form-engine
- * components: they need a `field` descriptor and emit a `ub-input` CustomEvent
- * instead of firing React's onChange. These thin wrappers hand-wire both so the
- * rest of the app can treat them like plain controlled inputs.
- *
- * `field` / `value` are passed as JSX props (React 19 sets them as DOM
- * properties *before* the element's first render — an effect would run too late
- * and the element would render against an undefined `field`). The `ub-input`
- * CustomEvent still needs addEventListener, wired via a callback ref.
- */
-
-type FieldEl = HTMLElement & { field: FieldDescriptor; value: unknown }
-
-/** Attach a one-time `ub-input` listener without leaking on unmount/re-attach. */
-function useUbInput(onValue: (v: unknown) => void) {
-  return useCallback(
-    (el: FieldEl | null) => {
-      if (!el) return
-      const handler = (e: Event) => onValue((e as CustomEvent).detail.value)
-      el.addEventListener('ub-input', handler)
-      return () => el.removeEventListener('ub-input', handler)
-    },
-    [onValue],
-  )
+const inputStyle: CSSProperties = {
+  padding: '8px 10px',
+  fontSize: 14,
+  border: '1px solid #ccc',
+  borderRadius: 6,
 }
 
-/** Single-line text field backed by <ub-input>. */
 export function TextField({
   value,
   onChange,
   onEnter,
   placeholder,
+  type = 'text',
+  style,
 }: {
   value: string
   onChange: (value: string) => void
   onEnter?: () => void
   placeholder?: string
+  type?: string
+  style?: CSSProperties
 }) {
-  const field = useMemo<FieldDescriptor>(
-    () => ({ order: 1, type: 'text', key: 'text', placeholder }),
-    [placeholder],
-  )
-  const ref = useUbInput((v) => onChange(v as string))
-
   return (
-    <ub-input
-      ref={ref}
-      field={field}
+    <input
+      type={type}
       value={value}
-      style={{ flex: 1 }}
+      onChange={(e) => onChange(e.target.value)}
       onKeyDown={(e: KeyboardEvent) => e.key === 'Enter' && onEnter?.()}
+      placeholder={placeholder}
+      style={{ ...inputStyle, ...style }}
     />
   )
 }
 
-/** Checkbox backed by <ub-checkbox>. */
-export function CheckField({
-  checked,
-  label,
-  onChange,
+export function Button({
+  onClick,
+  children,
+  variant = 'default',
 }: {
-  checked: boolean
-  label: string
-  onChange: (checked: boolean) => void
+  onClick: () => void
+  children: React.ReactNode
+  variant?: 'default' | 'primary'
 }) {
-  const field = useMemo<FieldDescriptor>(
-    () => ({ order: 1, type: 'checkbox', key: 'done', label }),
-    [label],
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: '8px 14px',
+        fontSize: 14,
+        borderRadius: 6,
+        border: '1px solid #ccc',
+        cursor: 'pointer',
+        background: variant === 'primary' ? '#2563eb' : '#fff',
+        color: variant === 'primary' ? '#fff' : '#111',
+      }}
+    >
+      {children}
+    </button>
   )
-  const ref = useUbInput((v) => onChange(v as boolean))
-
-  return <ub-checkbox ref={ref} field={field} value={checked} />
 }

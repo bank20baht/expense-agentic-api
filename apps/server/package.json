@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.2.0",
+    "@elysiajs/jwt": "^1.2.0",
     "@elysiajs/openapi": "^1.4.15",
     "elysia": "^1.2.10"
   },
